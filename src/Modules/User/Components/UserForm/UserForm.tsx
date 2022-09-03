@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useEffect, useReducer } from 'react';
 
 import {
+  ActionIcon,
   Alert,
   Button,
-  Center,
   Container,
   createStyles,
   Grid,
   Group,
+  Loader,
   PasswordInput,
   Radio,
   Space,
@@ -18,7 +19,12 @@ import { useForm } from '@mantine/form';
 import { User } from '../../../../app/interface/user/user';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../app/store';
-import { postUser } from '../../slice/usersSlice';
+import { postUser, updateUser } from '../../slice/usersSlice';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCircleArrowLeft,
+  faExclamationTriangle,
+} from '@fortawesome/free-solid-svg-icons';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -34,11 +40,70 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const UserForm = () => {
-  const { classes } = useStyles();
+interface AlertState {
+  isLoading: boolean;
+  success: string;
+  error: string;
+}
+interface AlertAction {
+  type: string;
+  payload?: string;
+}
+
+const initialAlertState: AlertState = {
+  isLoading: false,
+  success: '',
+  error: '',
+};
+
+const alertReducer = (state: AlertState, { type, payload }: AlertAction) => {
+  switch (type) {
+    case 'PENDING':
+      return {
+        ...initialAlertState,
+        isLoading: true,
+      };
+    case 'SUCCESS':
+      return {
+        ...state,
+        isLoading: false,
+        error: '',
+        success: payload as string,
+      };
+    case 'ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        error: payload as string,
+        success: '',
+      };
+    case 'RESET':
+      return {
+        ...initialAlertState,
+      };
+    default:
+      return state;
+  }
+};
+
+interface UserFormProps {
+  userDetail: User | undefined;
+  onShowTable: () => void;
+  onSetDefaultUser: () => void;
+}
+
+const UserForm = ({
+  userDetail,
+  onShowTable,
+  onSetDefaultUser,
+}: UserFormProps) => {
+  const [alertState, dispatchAlert] = useReducer(
+    alertReducer,
+    initialAlertState
+  );
   const dispatch = useDispatch<AppDispatch>();
 
-  const formValidate = useForm({
+  const form = useForm({
     initialValues: {
       taiKhoan: '',
       hoTen: '',
@@ -58,107 +123,176 @@ const UserForm = () => {
     }),
   });
 
+  const resetFormHandler = () => {
+    form.setValues({
+      taiKhoan: '',
+      hoTen: '',
+      matKhau: '',
+      soDT: '',
+      email: '',
+      maLoaiNguoiDung: '',
+    });
+
+    dispatchAlert({ type: 'RESET' });
+  };
+
   const submitHandler = async (values: User) => {
+    dispatchAlert({ type: 'PENDING' });
     try {
-      const data = await dispatch(postUser(values)).unwrap();
-      console.log(data);
+      if (userDetail) {
+        const data = await dispatch(updateUser(values)).unwrap();
+        dispatchAlert({
+          type: 'SUCCESS',
+          payload: 'Cập nhật người dùng thành công',
+        });
+        return data;
+      } else {
+        const data = await dispatch(postUser(values)).unwrap();
+        dispatchAlert({
+          type: 'SUCCESS',
+          payload: 'Thêm người dùng thành công',
+        });
+        return data;
+      }
     } catch (error) {
-      console.log(error);
+      dispatchAlert({ type: 'ERROR', payload: error as string });
     }
   };
 
+  useEffect(() => {
+    if (!userDetail) return;
+    form.setValues({
+      ...userDetail,
+    });
+  }, [userDetail]);
+
   return (
-    <Container size={720}>
-      <form onSubmit={formValidate.onSubmit(submitHandler)}>
-        <Grid gutter='xl'>
-          <Grid.Col sm={6}>
-            <TextInput
-              sx={{
-                textAlign: 'left',
-              }}
-              placeholder='Nhập tài khoản'
-              label='Tài khoản'
-              withAsterisk
-              {...formValidate.getInputProps('taiKhoan')}
-            />
-          </Grid.Col>
-          <Grid.Col sm={6}>
-            <TextInput
-              sx={{
-                textAlign: 'left',
-              }}
-              placeholder='Nhập họ và tên'
-              label='Họ tên'
-              withAsterisk
-              {...formValidate.getInputProps('hoTen')}
-            />
-          </Grid.Col>
-          <Grid.Col sm={6}>
-            <TextInput
-              sx={{
-                textAlign: 'left',
-              }}
-              placeholder='Nhập email'
-              label='Email'
-              withAsterisk
-              {...formValidate.getInputProps('email')}
-            />
-          </Grid.Col>
-          <Grid.Col sm={6}>
-            <PasswordInput
-              sx={{
-                textAlign: 'left',
-              }}
-              placeholder='Nhập mật khẩu'
-              label='Mật khẩu'
-              withAsterisk
-              {...formValidate.getInputProps('matKhau')}
-            />
-          </Grid.Col>
-          <Grid.Col sm={6}>
-            <TextInput
-              sx={{
-                textAlign: 'left',
-              }}
-              placeholder='Nhập số điện thoại'
-              label='Số điện thoại'
-              withAsterisk
-              {...formValidate.getInputProps('soDT')}
-            />
-          </Grid.Col>
-          <Grid.Col sm={6}>
-            <Radio.Group
-              label='Chọn vai trò'
-              withAsterisk
-              {...formValidate.getInputProps('maLoaiNguoiDung')}
-            >
-              <Radio value='KhachHang' label='Khách hàng' />
-              <Radio value='QuanTri' label='Quản trị' />
-            </Radio.Group>
-          </Grid.Col>
-        </Grid>
-        <Space h={32} />
-        <Group position='right'>
-          <Button
-            onClick={() =>
-              formValidate.setValues({
-                taiKhoan: '',
-                hoTen: '',
-                matKhau: '',
-                soDT: '',
-                email: '',
-                maLoaiNguoiDung: '',
-              })
+    <>
+      <Group>
+        <ActionIcon
+          sx={{
+            fontSize: 24,
+          }}
+          color='gray'
+          variant='transparent'
+          onClick={() => {
+            onSetDefaultUser();
+            onShowTable();
+          }}
+        >
+          <FontAwesomeIcon icon={faCircleArrowLeft} />
+        </ActionIcon>
+      </Group>
+      <Space h={16} />
+      <Container
+        sx={{
+          textAlign: 'left',
+        }}
+        size={720}
+      >
+        <form onSubmit={form.onSubmit(submitHandler)}>
+          <Grid gutter='xl'>
+            <Grid.Col sm={6}>
+              <TextInput
+                placeholder='Nhập tài khoản'
+                label='Tài khoản'
+                disabled={userDetail ? true : false}
+                withAsterisk
+                {...form.getInputProps('taiKhoan')}
+              />
+            </Grid.Col>
+            <Grid.Col sm={6}>
+              <TextInput
+                placeholder='Nhập họ và tên'
+                label='Họ tên'
+                withAsterisk
+                {...form.getInputProps('hoTen')}
+              />
+            </Grid.Col>
+            <Grid.Col sm={6}>
+              <TextInput
+                placeholder='Nhập email'
+                label='Email'
+                withAsterisk
+                {...form.getInputProps('email')}
+              />
+            </Grid.Col>
+            <Grid.Col sm={6}>
+              <PasswordInput
+                placeholder='Nhập mật khẩu'
+                label='Mật khẩu'
+                withAsterisk
+                {...form.getInputProps('matKhau')}
+              />
+            </Grid.Col>
+            <Grid.Col sm={6}>
+              <TextInput
+                placeholder='Nhập số điện thoại'
+                label='Số điện thoại'
+                withAsterisk
+                {...form.getInputProps('soDT')}
+              />
+            </Grid.Col>
+            <Grid.Col sm={6}>
+              <Radio.Group
+                label='Chọn vai trò'
+                withAsterisk
+                {...form.getInputProps('maLoaiNguoiDung')}
+              >
+                <Radio value='KhachHang' label='Khách hàng' />
+                <Radio value='QuanTri' label='Quản trị' />
+              </Radio.Group>
+            </Grid.Col>
+          </Grid>
+          <Space h={32} />
+          <Group position='right'>
+            <Button onClick={resetFormHandler} variant='light' color='red'>
+              Xóa tất cả
+            </Button>
+            <Button type='submit'>
+              {userDetail && 'Cập nhật'}
+              {!userDetail && 'Thêm'}
+            </Button>
+          </Group>
+        </form>
+        <Space h={48} />
+        {alertState.isLoading && (
+          <Alert
+            icon={<Loader size={24} />}
+            title={userDetail ? 'Cập nhật người dùng' : 'Thêm người dùng'}
+            color='indigo'
+          >
+            Đang tải...
+          </Alert>
+        )}
+        {alertState.error && (
+          <Alert
+            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            title={
+              userDetail
+                ? 'Cập nhật người dùng thất bại'
+                : 'Thêm người dùng thất bại'
             }
-            variant='light'
             color='red'
           >
-            Xóa tất cả
-          </Button>
-          <Button type='submit'>Thêm</Button>
-        </Group>
-      </form>
-    </Container>
+            {alertState.error}
+          </Alert>
+        )}
+        {alertState.success && (
+          <Alert
+            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            title={
+              userDetail
+                ? 'Cập nhật người dùng thành công'
+                : 'Thêm người dùng thành công'
+            }
+            color='green'
+          >
+            {alertState.success}
+          </Alert>
+        )}
+      </Container>
+    </>
   );
 };
 

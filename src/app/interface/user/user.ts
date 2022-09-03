@@ -6,3 +6,7 @@ export interface User {
   matKhau: string;
   maLoaiNguoiDung: string;
 }
+
+export interface NewUser extends User {
+  maNhom: string;
+}

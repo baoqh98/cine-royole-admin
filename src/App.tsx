@@ -6,12 +6,14 @@ import { AppDispatch } from './app/store';
 import { login } from './Modules/Auth/slice/authSlice';
 import Layout from './UI/Layout/Pages/Layout';
 
-const User = React.lazy(() => import('./Modules/User/Pages/User'));
+const User = React.lazy(() => import('./Modules/User/Pages/UserPage'));
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
+
+  // DUMMY ACCOUNT IN ORDER TO IMMEDIATELY ACCESS TO API
   useEffect(() => {
-    dispatch(login({ taiKhoan: 'aa01', matKhau: '12345678' }));
+    dispatch(login({ taiKhoan: 'abc123', matKhau: '123456789' }));
   }, []);
 
   return (
