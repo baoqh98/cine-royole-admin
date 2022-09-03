@@ -71,7 +71,14 @@ interface HeaderSearchProps {
 const HeaderData: HeaderSearchProps = {
   links: [
     { link: 'https://cineroyole.vercel.app/', label: 'Go to App' },
-    { link: 'https://github.com/hoquocbaoproton/cineroyole', label: 'GitHub' },
+    {
+      link: 'https://github.com/hoquocbaoproton/cineroyole',
+      label: 'GitHub CineRoyole',
+    },
+    {
+      link: 'https://github.com/hoquocbaoproton/cine-royole-admin',
+      label: 'GitHub CineRoyole Admin',
+    },
     {
       link: 'https://github.com/hoquocbaoproton/cineroyole',
       label: 'My Portfolio',
