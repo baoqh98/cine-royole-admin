@@ -1,9 +1,11 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
+import authReducer from '../Modules/Auth/slice/authSlice';
+import usersReducer from '../Modules/User/slice/usersSlice';
 
 export const store = configureStore({
   reducer: {
-    counter: counterReducer,
+    auth: authReducer,
+    users: usersReducer,
   },
 });
 
@@ -15,3 +17,6 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   unknown,
   Action<string>
 >;
+
+export const authSelector = (state: RootState) => state.auth;
+export const userSelector = (state: RootState) => state.users;
