@@ -17,7 +17,7 @@ const useStyles = createStyles((theme, _params, getRef) => {
       position: 'fixed',
       top: 0,
       left: 0,
-      width: '345px',
+      width: '240px',
       height: '100vh',
     },
     header: {
@@ -104,18 +104,14 @@ const data = [
 
 export default function SideBar() {
   const { classes, cx } = useStyles();
-  const [active, setActive] = useState<string>(data[0].label);
 
   const links = data.map((item) => (
     <NavLink
-      className={cx(classes.link, {
-        [classes.linkActive]: item.label === active,
-      })}
       to={item.link}
       key={item.label}
-      onClick={(event) => {
-        setActive(item.label);
-      }}
+      className={({ isActive }) =>
+        cx(classes.link, { [classes.linkActive]: isActive })
+      }
     >
       <FontAwesomeIcon className={classes.linkIcon} icon={item.icon} />
       <span>{item.label}</span>

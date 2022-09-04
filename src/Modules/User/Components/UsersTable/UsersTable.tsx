@@ -20,7 +20,7 @@ import {
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, userSelector } from '../../../../app/store';
-import { deleteUser, getUsers } from '../../slice/usersSlice';
+import { deleteUser, getUsersData } from '../../slice/usersSlice';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -57,15 +57,9 @@ const jobColors: Record<string, string> = {
 
 interface UserTableProps {
   onGetAccount: (account: string) => void;
-  onShowForm: () => void;
-  onSetDefaultUser: () => void;
 }
 
-export default function UsersTable({
-  onGetAccount,
-  onShowForm,
-  onSetDefaultUser,
-}: UserTableProps) {
+export default function UsersTable({ onGetAccount }: UserTableProps) {
   const [status, setStatus] = useState<unknown>('');
   const [account, setAccount] = useState<string>('');
   const [isModalOpened, setIsModalOpen] = useState<boolean>(false);
@@ -90,14 +84,14 @@ export default function UsersTable({
     try {
       const data = await dispatch(deleteUser(account)).unwrap();
       setStatus(data);
-      dispatch(getUsers(null));
+      dispatch(getUsersData(null));
     } catch (error) {
       setStatus(error);
     }
   };
 
   useEffect(() => {
-    dispatch(getUsers(null));
+    dispatch(getUsersData(null));
   }, []);
 
   const rows = users.map((item) => (
@@ -209,16 +203,7 @@ export default function UsersTable({
           )}
         </Group>
       </Modal>
-      <Group>
-        <Button
-          onClick={() => {
-            onShowForm();
-            onSetDefaultUser();
-          }}
-        >
-          Thên tài khoản
-        </Button>
-      </Group>
+
       <Space h={16} />
       <ScrollArea
         sx={{ height: 720 }}

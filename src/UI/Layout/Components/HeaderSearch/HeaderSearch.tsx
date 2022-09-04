@@ -14,7 +14,7 @@ const useStyles = createStyles((theme) => ({
   header: {
     position: 'fixed',
     top: 0,
-    left: '345px',
+    left: '240px',
     paddingLeft: theme.spacing.md,
     paddingRight: theme.spacing.md,
   },

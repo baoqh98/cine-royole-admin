@@ -1,11 +1,13 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import authReducer from '../Modules/Auth/slice/authSlice';
 import usersReducer from '../Modules/User/slice/usersSlice';
+import movieReducer from '../Modules/Movies/slice/movieSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     users: usersReducer,
+    movies: movieReducer,
   },
 });
 
@@ -20,3 +22,4 @@ export type AppThunk<ReturnType = void> = ThunkAction<
 
 export const authSelector = (state: RootState) => state.auth;
 export const userSelector = (state: RootState) => state.users;
+export const movieSelector = (state: RootState) => state.movies;

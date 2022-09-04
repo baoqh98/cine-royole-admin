@@ -88,15 +88,9 @@ const alertReducer = (state: AlertState, { type, payload }: AlertAction) => {
 
 interface UserFormProps {
   userDetail: User | undefined;
-  onShowTable: () => void;
-  onSetDefaultUser: () => void;
 }
 
-const UserForm = ({
-  userDetail,
-  onShowTable,
-  onSetDefaultUser,
-}: UserFormProps) => {
+const UserForm = ({ userDetail }: UserFormProps) => {
   const [alertState, dispatchAlert] = useReducer(
     alertReducer,
     initialAlertState
@@ -168,21 +162,6 @@ const UserForm = ({
 
   return (
     <>
-      <Group>
-        <ActionIcon
-          sx={{
-            fontSize: 24,
-          }}
-          color='gray'
-          variant='transparent'
-          onClick={() => {
-            onSetDefaultUser();
-            onShowTable();
-          }}
-        >
-          <FontAwesomeIcon icon={faCircleArrowLeft} />
-        </ActionIcon>
-      </Group>
       <Space h={16} />
       <Container
         sx={{

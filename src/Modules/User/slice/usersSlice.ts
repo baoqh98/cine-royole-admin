@@ -1,10 +1,8 @@
-import { UserData } from './../../../app/interface/auth/auth';
-import { maNhom } from './../../../app/apis/params';
-import { authAPis } from './../../../app/apis/authAPIs';
-
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { userAPIs } from '../../../app/apis/userAPIs';
 import { NewUser, User } from '../../../app/interface/user/user';
+import { thunk } from './../../../app/apis/helper/thunkFunction';
+import { maNhom } from './../../../app/apis/params';
 
 interface UserState {
   users: User[];
@@ -18,32 +16,9 @@ const initialState: UserState = {
   error: '',
 };
 
-export const getUsers = createAsyncThunk(
-  'user/getUsers',
-  async (searchQuery: string | null, { rejectWithValue, dispatch }) => {
-    try {
-      const { getUsers } = userAPIs;
-      const data = searchQuery ? await getUsers(searchQuery) : await getUsers();
-      return data;
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
+const { getUsers } = userAPIs;
 
-// export const postToGetUser = createAsyncThunk(
-//   'user/postToGetUser',
-//   async (account: string, { rejectWithValue }) => {
-//     try {
-//       const { postToGetUser } = userAPIs;
-//       const data = await postToGetUser(account);
-//       console.log(data);
-//       return data;
-//     } catch (error) {
-//       throw rejectWithValue(error);
-//     }
-//   }
-// );
+export const getUsersData = thunk.getData('user/getUsers', getUsers);
 
 export const getUserDetail = createAsyncThunk(
   'user/getUserDetail',
@@ -111,14 +86,14 @@ const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getUsers.pending, (state) => {
+      .addCase(getUsersData.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getUsers.fulfilled, (state, { payload }) => {
+      .addCase(getUsersData.fulfilled, (state, { payload }) => {
         state.isLoading = false;
         state.users = payload as User[];
       })
-      .addCase(getUsers.rejected, (state, { payload }) => {
+      .addCase(getUsersData.rejected, (state, { payload }) => {
         state.error = payload as string;
         state.isLoading = false;
       });

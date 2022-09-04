@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 
 const useStyle = createStyles((theme) => ({
   wrapper: {
-    marginLeft: '345px',
+    marginLeft: '240px',
     marginTop: 56,
     height: '100%',
     paddingTop: theme.spacing.lg,
