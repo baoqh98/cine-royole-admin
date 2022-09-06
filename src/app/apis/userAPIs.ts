@@ -29,8 +29,12 @@ export const userAPIs = {
     );
   },
 
-  postUser: (user: NewUser) => {
-    return axiosClient.post('QuanLyNguoiDung/ThemNguoiDung', user);
+  postUser: (user: User) => {
+    const newUser = {
+      ...user,
+      maNhom,
+    };
+    return axiosClient.post('QuanLyNguoiDung/ThemNguoiDung', newUser);
   },
 
   updateUser: (user: NewUser) => {

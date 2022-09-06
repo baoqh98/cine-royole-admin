@@ -12,3 +12,11 @@ export interface Movie {
   dangChieu: boolean;
   sapChieu: boolean;
 }
+
+export interface MovieFormType
+  extends Omit<
+    Movie,
+    'maNhom' | 'biDanh' | 'maPhim' | 'ngayKhoiChieu' | 'hinhAnh'
+  > {
+  ngayKhoiChieu: string;
+}

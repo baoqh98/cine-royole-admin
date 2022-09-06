@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   createStyles,
   Table,
@@ -11,6 +11,9 @@ import {
 import { Movie } from '../../../../app/interface/movie/movie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, movieSelector } from '../../../../app/store';
+import { getMoviesData } from '../../slice/movieSlice';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -56,15 +59,17 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-interface TableScrollAreaProps {
-  data: Movie[];
-}
-
-export default function MovieTable({ data }: TableScrollAreaProps) {
+export default function MovieTable() {
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState(false);
+  const { movies, isLoading } = useSelector(movieSelector);
+  const dispatch = useDispatch<AppDispatch>();
 
-  const rows = data.map((row) => (
+  useEffect(() => {
+    dispatch(getMoviesData(null));
+  }, []);
+
+  const rows = movies.map((row) => (
     <tr key={row.maPhim}>
       <td className={classes.align}>{row.tenPhim}</td>
       <td className={classes.align}>
@@ -81,9 +86,14 @@ export default function MovieTable({ data }: TableScrollAreaProps) {
 
       <td className={classes.align}>{row.biDanh}</td>
       <td className={`${classes.align} ${classes.status}`}>
-        <Group>
+        <Group
+          sx={{
+            flexDirection: 'column',
+          }}
+        >
           {row.dangChieu ? <Badge>Đang chiếu</Badge> : null}
           {row.hot ? <Badge color='red'>Hot</Badge> : null}
+          {row.sapChieu ? <Badge color='green'>Sap chiếu</Badge> : null}
         </Group>
       </td>
 

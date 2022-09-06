@@ -16,7 +16,7 @@ const initialState: UserState = {
   error: '',
 };
 
-const { getUsers } = userAPIs;
+const { getUsers, postUser } = userAPIs;
 
 export const getUsersData = thunk.getData('user/getUsers', getUsers);
 
@@ -33,22 +33,20 @@ export const getUserDetail = createAsyncThunk(
   }
 );
 
-export const postUser = createAsyncThunk(
-  'user/postUser',
-  async (user: User, { rejectWithValue }) => {
-    try {
-      const { postUser } = userAPIs;
-      const newUser: NewUser = {
-        ...user,
-        maNhom,
-      };
-      const data = await postUser(newUser);
-      return data;
-    } catch (error) {
-      throw rejectWithValue(error);
-    }
-  }
-);
+export const postUserData = thunk.postData('user/postUser', postUser);
+
+// export const postUser = createAsyncThunk(
+//   'user/postUser',
+//   async (user: User, { rejectWithValue }) => {
+//     try {
+//       const { postUser } = userAPIs;
+//       const data = await postUser(user);
+//       return data;
+//     } catch (error) {
+//       throw rejectWithValue(error);
+//     }
+//   }
+// );
 
 export const updateUser = createAsyncThunk(
   'user/updateUser',

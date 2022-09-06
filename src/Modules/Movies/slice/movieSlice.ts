@@ -15,9 +15,10 @@ const initialState: MovieState = {
   error: '',
 };
 
-const { getMovies } = movieAPIs;
+const { getMovies, postMovie } = movieAPIs;
 
 export const getMoviesData = thunk.getData('movie/getMovies', getMovies);
+export const postMovieData = thunk.postData('movie/postMovie', postMovie);
 
 const movieSlice = createSlice({
   name: 'movie',

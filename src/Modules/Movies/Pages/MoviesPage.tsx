@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Title,
@@ -6,11 +6,12 @@ import {
   createStyles,
   Group,
   Button,
+  ActionIcon,
 } from '@mantine/core';
 import MovieTable from '../Components/MovieTable';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, movieSelector } from '../../../app/store';
-import { getMoviesData } from '../slice/movieSlice';
+import MovieForm from '../Components/MovieForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const useStyle = createStyles((theme) => ({
   title: {
@@ -21,24 +22,41 @@ const useStyle = createStyles((theme) => ({
 
 const MoviesPage = () => {
   const { classes } = useStyle();
-  const { movies, isLoading } = useSelector(movieSelector);
-  const dispatch = useDispatch<AppDispatch>();
-
-  useEffect(() => {
-    dispatch(getMoviesData(null));
-  }, []);
-
-  console.log(movies);
+  const [isShowForm, setIsShowForm] = useState<boolean>(true);
 
   return (
     <Container fluid>
       <Title className={classes.title}>Quản lý Phim</Title>
       <Space h={16} />
       <Group>
-        <Button>Thêm phim</Button>
+        {!isShowForm && (
+          <Button
+            onClick={() => {
+              setIsShowForm(true);
+            }}
+          >
+            Thên Phim
+          </Button>
+        )}
+
+        {isShowForm && (
+          <ActionIcon
+            sx={{
+              fontSize: 24,
+            }}
+            color='gray'
+            variant='transparent'
+            onClick={() => {
+              setIsShowForm(false);
+            }}
+          >
+            <FontAwesomeIcon icon={faCircleArrowLeft} />
+          </ActionIcon>
+        )}
       </Group>
       <Space h={16} />
-      <MovieTable data={movies} />
+      {!isShowForm && <MovieTable />}
+      {isShowForm && <MovieForm />}
     </Container>
   );
 };

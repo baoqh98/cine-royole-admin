@@ -5,7 +5,7 @@ export const thunk = {
     name: string,
     callbackGet: (searchQuery?: string) => Promise<T>
   ) => {
-    const modifiedThunkFn = createAsyncThunk(
+    const modifiedGetThunkFn = createAsyncThunk(
       name,
       async (searchQuery: string | null, { rejectWithValue }) => {
         try {
@@ -18,6 +18,22 @@ export const thunk = {
         }
       }
     );
-    return modifiedThunkFn;
+    return modifiedGetThunkFn;
+  },
+
+  postData: <T>(name: string, callbackPost: (data: any) => Promise<T>) => {
+    const modifiedPostThunkFn = createAsyncThunk(
+      name,
+      async (data: any, { rejectWithValue }) => {
+        try {
+          const result = await callbackPost(data);
+          return result;
+        } catch (error) {
+          return rejectWithValue(error);
+        }
+      }
+    );
+
+    return modifiedPostThunkFn;
   },
 };

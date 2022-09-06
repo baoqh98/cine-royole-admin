@@ -19,7 +19,7 @@ import { useForm } from '@mantine/form';
 import { User } from '../../../../app/interface/user/user';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../app/store';
-import { postUser, updateUser } from '../../slice/usersSlice';
+import { postUserData, updateUser } from '../../slice/usersSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCircleArrowLeft,
@@ -118,14 +118,7 @@ const UserForm = ({ userDetail }: UserFormProps) => {
   });
 
   const resetFormHandler = () => {
-    form.setValues({
-      taiKhoan: '',
-      hoTen: '',
-      matKhau: '',
-      soDT: '',
-      email: '',
-      maLoaiNguoiDung: '',
-    });
+    form.reset();
 
     dispatchAlert({ type: 'RESET' });
   };
@@ -139,13 +132,15 @@ const UserForm = ({ userDetail }: UserFormProps) => {
           type: 'SUCCESS',
           payload: 'Cập nhật người dùng thành công',
         });
+
         return data;
       } else {
-        const data = await dispatch(postUser(values)).unwrap();
+        const data = await dispatch(postUserData(values)).unwrap();
         dispatchAlert({
           type: 'SUCCESS',
           payload: 'Thêm người dùng thành công',
         });
+        form.reset();
         return data;
       }
     } catch (error) {
@@ -228,7 +223,7 @@ const UserForm = ({ userDetail }: UserFormProps) => {
             <Button onClick={resetFormHandler} variant='light' color='red'>
               Xóa tất cả
             </Button>
-            <Button type='submit'>
+            <Button type='submit' loading={alertState.isLoading}>
               {userDetail && 'Cập nhật'}
               {!userDetail && 'Thêm'}
             </Button>

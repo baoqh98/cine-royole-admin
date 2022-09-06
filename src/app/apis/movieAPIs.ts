@@ -3,9 +3,14 @@ import { axiosClient } from './axiosClient';
 import { maNhom } from './params';
 export const movieAPIs = {
   getMovies: () => {
-    const params = maNhom;
+    const params = new URLSearchParams();
+    params.append('maNhom', maNhom);
     return axiosClient.get<unknown, Movie[]>('QuanLyPhim/LayDanhSachPhim', {
-      params: params,
+      params,
     });
+  },
+
+  postMovie: (formData: FormData) => {
+    return axiosClient.post('QuanLyPhim/ThemPhimUploadHinh', formData);
   },
 };
