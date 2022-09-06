@@ -176,7 +176,7 @@ export default function UsersTable({ onGetAccount }: UserTableProps) {
             {account}
           </Title>
         </Group>
-
+        <Space h={16} />
         <Group position='center'>
           <Text
             sx={{

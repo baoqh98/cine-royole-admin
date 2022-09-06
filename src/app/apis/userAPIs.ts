@@ -43,7 +43,6 @@ export const userAPIs = {
 
   deleteUser: (account: string) => {
     const params = new URLSearchParams();
-    // params.append('maNhom', maNhom);
     params.append('TaiKhoan', account);
     return axiosClient.delete('QuanLyNguoiDung/XoaNguoiDung', {
       params: params,

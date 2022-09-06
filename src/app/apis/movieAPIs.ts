@@ -13,4 +13,12 @@ export const movieAPIs = {
   postMovie: (formData: FormData) => {
     return axiosClient.post('QuanLyPhim/ThemPhimUploadHinh', formData);
   },
+
+  deleteMovie: (id: string) => {
+    const params = new URLSearchParams();
+    params.append('MaPhim', id);
+    return axiosClient.delete('QuanLyPhim/XoaPhim', {
+      params: params,
+    });
+  },
 };

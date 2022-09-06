@@ -36,4 +36,20 @@ export const thunk = {
 
     return modifiedPostThunkFn;
   },
+
+  deleteData: <T>(param: string, callbackDel: (data: any) => Promise<T>) => {
+    const modifiedPostThunkFn = createAsyncThunk(
+      param,
+      async (data: any, { rejectWithValue }) => {
+        try {
+          const result = await callbackDel(data);
+          return result;
+        } catch (error) {
+          return rejectWithValue(error);
+        }
+      }
+    );
+
+    return modifiedPostThunkFn;
+  },
 };

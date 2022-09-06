@@ -7,13 +7,18 @@ import {
   Group,
   ActionIcon,
   Badge,
+  Space,
+  Title,
+  Modal,
+  Text,
+  Button,
 } from '@mantine/core';
 import { Movie } from '../../../../app/interface/movie/movie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, movieSelector } from '../../../../app/store';
-import { getMoviesData } from '../../slice/movieSlice';
+import { deleteMovieData, getMoviesData } from '../../slice/movieSlice';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -61,9 +66,34 @@ const useStyles = createStyles((theme) => ({
 
 export default function MovieTable() {
   const { classes, cx } = useStyles();
+  const [isModalOpened, setIsModalOpen] = useState<boolean>(false);
+  const [movieInfo, setMovieInfo] = useState<{
+    movieId: string;
+    movieName: string;
+  }>();
+  const [status, setStatus] = useState<unknown>();
   const [scrolled, setScrolled] = useState(false);
-  const { movies, isLoading } = useSelector(movieSelector);
+  const { movies } = useSelector(movieSelector);
+
   const dispatch = useDispatch<AppDispatch>();
+
+  const openDeleteModalHandler = (movieId: string, movieName: string) => {
+    setIsModalOpen(true);
+    setMovieInfo({
+      movieId,
+      movieName,
+    });
+  };
+
+  const deleteAccountHandler = async (movieId: string) => {
+    try {
+      const data = await dispatch(deleteMovieData(movieId)).unwrap();
+      setStatus(data);
+      dispatch(getMoviesData(null));
+    } catch (error) {
+      setStatus(error);
+    }
+  };
 
   useEffect(() => {
     dispatch(getMoviesData(null));
@@ -107,7 +137,10 @@ export default function MovieTable() {
           <ActionIcon color='green'>
             <FontAwesomeIcon icon={faPen} />
           </ActionIcon>
-          <ActionIcon color='red'>
+          <ActionIcon
+            onClick={() => openDeleteModalHandler(`${row.maPhim}`, row.tenPhim)}
+            color='red'
+          >
             <FontAwesomeIcon icon={faTrash} />
           </ActionIcon>
         </Group>
@@ -116,26 +149,75 @@ export default function MovieTable() {
   ));
 
   return (
-    <ScrollArea
-      type='scroll'
-      sx={{ height: 720 }}
-      onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
-    >
-      <Table sx={{ minWidth: 700 }}>
-        <thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
-          <tr>
-            <th>Tên phim</th>
-            <th>Hình ảnh</th>
-            <th>Bí danh</th>
-            <th>Trạng thái</th>
-            <th>Đánh giá</th>
-            <th>Mô tả</th>
-            <th>Ngày chiếu</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </Table>
-    </ScrollArea>
+    <>
+      <Modal
+        title='Bạn có chắc chắn xóa phim?'
+        opened={isModalOpened}
+        onClose={() => setIsModalOpen(false)}
+        centered
+        overlayBlur={4}
+      >
+        <Group position='center'>
+          <Title order={3} color='blue'>
+            {`Mã phim: ${movieInfo?.movieId} - Tên: ${movieInfo?.movieName}`}
+          </Title>
+        </Group>
+        <Space h={16} />
+        <Group position='center'>
+          <Text
+            sx={{
+              textAlign: 'center',
+            }}
+            color='red'
+          >
+            {status as string}
+          </Text>
+        </Group>
+        <Space h={16} />
+        <Group position='right'>
+          <Button
+            color='blue'
+            variant='light'
+            onClick={() => {
+              setIsModalOpen(false);
+              setStatus(undefined);
+            }}
+          >
+            Thoát
+          </Button>
+
+          <Button
+            color='red'
+            onClick={() => deleteAccountHandler(movieInfo!.movieId)}
+          >
+            Xóa tài khoản
+          </Button>
+        </Group>
+      </Modal>
+
+      <ScrollArea
+        type='scroll'
+        sx={{ height: 720 }}
+        onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+      >
+        <Table sx={{ minWidth: 700 }}>
+          <thead
+            className={cx(classes.header, { [classes.scrolled]: scrolled })}
+          >
+            <tr>
+              <th>Tên phim</th>
+              <th>Hình ảnh</th>
+              <th>Bí danh</th>
+              <th>Trạng thái</th>
+              <th>Đánh giá</th>
+              <th>Mô tả</th>
+              <th>Ngày chiếu</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </Table>
+      </ScrollArea>
+    </>
   );
 }

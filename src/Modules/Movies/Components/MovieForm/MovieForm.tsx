@@ -144,7 +144,7 @@ const MovieForm = () => {
       dispatchAlert({ type: 'PENDING' });
       const date = new Date(values.ngayKhoiChieu);
       const dd = String(date.getDate()).padStart(2, '0');
-      const mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
       const yyyy = date.getFullYear();
       const ngayKhoiChieu = `${dd}/${mm}/${yyyy}`;
 
@@ -158,17 +158,16 @@ const MovieForm = () => {
       formData.append('ngayKhoiChieu', ngayKhoiChieu);
       formData.append('hinhAnh', selectedFile as Blob);
       formData.append('maNhom', maNhom);
-      console.log(values);
       try {
         const result = await dispatch(postMovieData(formData)).unwrap();
         dispatchAlert({
           type: 'SUCCESS',
           payload: 'Thêm phim thành công',
         });
+        resetFormHandler();
         return result;
       } catch (error) {
         dispatchAlert({ type: 'ERROR', payload: error as string });
-        console.log(error);
       }
     },
     [selectedFile, dispatch]

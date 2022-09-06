@@ -22,7 +22,7 @@ const useStyle = createStyles((theme) => ({
 
 const MoviesPage = () => {
   const { classes } = useStyle();
-  const [isShowForm, setIsShowForm] = useState<boolean>(true);
+  const [isShowForm, setIsShowForm] = useState<boolean>(false);
 
   return (
     <Container fluid>

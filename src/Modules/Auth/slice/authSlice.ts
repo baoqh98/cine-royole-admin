@@ -20,6 +20,7 @@ export const login = createAsyncThunk(
     try {
       const { login } = authAPis;
       const data = await login(user);
+      localStorage.setItem('bearer', `Bearer ${data.accessToken}`);
       return data;
     } catch (error) {
       rejectWithValue(error);
