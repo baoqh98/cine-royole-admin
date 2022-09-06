@@ -20,7 +20,7 @@ import {
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, userSelector } from '../../../../app/store';
-import { deleteUser, getUsersData } from '../../slice/usersSlice';
+import { deleteUserData, getUsersData } from '../../slice/usersSlice';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -82,7 +82,7 @@ export default function UsersTable({ onGetAccount }: UserTableProps) {
 
   const deleteAccountHandler = async (account: string) => {
     try {
-      const data = await dispatch(deleteUser(account)).unwrap();
+      const data = await dispatch(deleteUserData(account)).unwrap();
       setStatus(data);
       dispatch(getUsersData(null));
     } catch (error) {

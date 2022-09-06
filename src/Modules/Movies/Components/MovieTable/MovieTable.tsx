@@ -158,7 +158,7 @@ export default function MovieTable() {
         overlayBlur={4}
       >
         <Group position='center'>
-          <Title order={3} color='blue'>
+          <Title order={3} color='green'>
             {`Mã phim: ${movieInfo?.movieId} - Tên: ${movieInfo?.movieName}`}
           </Title>
         </Group>

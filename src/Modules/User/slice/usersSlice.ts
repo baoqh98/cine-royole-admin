@@ -16,9 +16,11 @@ const initialState: UserState = {
   error: '',
 };
 
-const { getUsers, postUser } = userAPIs;
+const { getUsers, postUser, deleteUser } = userAPIs;
 
 export const getUsersData = thunk.getData('user/getUsers', getUsers);
+export const postUserData = thunk.postData('user/postUser', postUser);
+export const deleteUserData = thunk.deleteData('user/deleteUser', deleteUser);
 
 export const getUserDetail = createAsyncThunk(
   'user/getUserDetail',
@@ -32,21 +34,6 @@ export const getUserDetail = createAsyncThunk(
     }
   }
 );
-
-export const postUserData = thunk.postData('user/postUser', postUser);
-
-// export const postUser = createAsyncThunk(
-//   'user/postUser',
-//   async (user: User, { rejectWithValue }) => {
-//     try {
-//       const { postUser } = userAPIs;
-//       const data = await postUser(user);
-//       return data;
-//     } catch (error) {
-//       throw rejectWithValue(error);
-//     }
-//   }
-// );
 
 export const updateUser = createAsyncThunk(
   'user/updateUser',
@@ -65,18 +52,18 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-export const deleteUser = createAsyncThunk(
-  'user/deleteUser',
-  async (account: string, { rejectWithValue }) => {
-    try {
-      const { deleteUser } = userAPIs;
-      const data = await deleteUser(account);
-      return data;
-    } catch (error) {
-      throw rejectWithValue(error);
-    }
-  }
-);
+// export const deleteUser = createAsyncThunk(
+//   'user/deleteUser',
+//   async (account: string, { rejectWithValue }) => {
+//     try {
+//       const { deleteUser } = userAPIs;
+//       const data = await deleteUser(account);
+//       return data;
+//     } catch (error) {
+//       throw rejectWithValue(error);
+//     }
+//   }
+// );
 
 const userSlice = createSlice({
   name: 'user',
