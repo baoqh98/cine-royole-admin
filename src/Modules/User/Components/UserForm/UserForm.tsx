@@ -22,7 +22,7 @@ import { AppDispatch } from '../../../../app/store';
 import { postUserData, updateUser } from '../../slice/usersSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCircleArrowLeft,
+  faCheckCircle,
   faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -254,7 +254,7 @@ const UserForm = ({ userDetail }: UserFormProps) => {
         )}
         {alertState.success && (
           <Alert
-            icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+            icon={<FontAwesomeIcon icon={faCheckCircle} />}
             title={
               userDetail
                 ? 'Cập nhật người dùng thành công'

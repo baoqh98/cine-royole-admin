@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useReducer,
+  useRef,
+  useCallback,
+} from 'react';
 import { useForm } from '@mantine/form';
 
 import {
@@ -11,7 +17,6 @@ import {
   Group,
   Space,
   Textarea,
-  NumberInput,
   Slider,
   Chip,
   Box,
@@ -20,11 +25,6 @@ import {
   Image,
 } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faCheckCircle,
-  faClock,
-  faExclamationTriangle,
-} from '@fortawesome/free-solid-svg-icons';
 import { MovieFormType } from '../../../../app/interface/movie/movie';
 import { useHover } from '@mantine/hooks';
 import CustomizedFileInput from './CustomizedFileInput';
@@ -33,6 +33,7 @@ import { maNhom } from '../../../../app/apis/params';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../app/store';
 import { postMovieData } from '../../slice/movieSlice';
+import FormAlert from '../FormAlert';
 
 const useStyle = createStyles((theme) => ({
   customLabel: {
@@ -49,8 +50,59 @@ const useStyle = createStyles((theme) => ({
   },
 }));
 
+interface AlertState {
+  isLoading: boolean;
+  success: string;
+  error: string;
+}
+interface AlertAction {
+  type: string;
+  payload?: string;
+}
+
+const initialAlertState: AlertState = {
+  isLoading: false,
+  success: '',
+  error: '',
+};
+
+const alertReducer = (state: AlertState, { type, payload }: AlertAction) => {
+  switch (type) {
+    case 'PENDING':
+      return {
+        ...initialAlertState,
+        isLoading: true,
+      };
+    case 'SUCCESS':
+      return {
+        ...state,
+        isLoading: false,
+        error: '',
+        success: payload as string,
+      };
+    case 'ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        error: payload as string,
+        success: '',
+      };
+    case 'RESET':
+      return {
+        ...initialAlertState,
+      };
+    default:
+      return state;
+  }
+};
+
 const MovieForm = () => {
   const { classes } = useStyle();
+
+  const [alertState, dispatchAlert] = useReducer(
+    alertReducer,
+    initialAlertState
+  );
   const [hotChip, setHotChip] = useState<boolean>(false);
   const [dangChieuChip, setDangChieuChip] = useState<boolean>(false);
   const [sapChieuChip, setSapChieuChip] = useState<boolean>(false);
@@ -79,7 +131,7 @@ const MovieForm = () => {
       trailer: (value) => (value === '' ? 'Phải nhập trailer' : null),
       moTa: (value) => (value === '' ? 'Chưa có mô tả phim' : null),
       ngayKhoiChieu: (value) =>
-        value === '' ? 'Bạn phải chọn giờ chiếu' : null,
+        value === '' ? 'Bạn phải chọn lịch chiếu' : null,
     },
   });
 
@@ -87,29 +139,40 @@ const MovieForm = () => {
     form.reset();
   };
 
-  const submitHandler = async (values: MovieFormType) => {
-    const date = new Date(values.ngayKhoiChieu);
-    const dd = String(date.getDate()).padStart(2, '0');
-    const mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
-    const yyyy = date.getFullYear();
-    const ngayKhoiChieu = `${dd}/${mm}/${yyyy}`;
+  const submitHandler = useCallback(
+    async (values: MovieFormType) => {
+      dispatchAlert({ type: 'PENDING' });
+      const date = new Date(values.ngayKhoiChieu);
+      const dd = String(date.getDate()).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+      const yyyy = date.getFullYear();
+      const ngayKhoiChieu = `${dd}/${mm}/${yyyy}`;
 
-    let formData = new FormData();
-    for (let key in values) {
-      if (values[key as keyof typeof values] === values.ngayKhoiChieu) continue;
-      formData.append(key, `${values[key as keyof typeof values]}`);
-    }
+      let formData = new FormData();
+      for (let key in values) {
+        if (values[key as keyof typeof values] === values.ngayKhoiChieu)
+          continue;
+        formData.append(key, `${values[key as keyof typeof values]}`);
+      }
 
-    formData.append('ngayKhoiChieu', ngayKhoiChieu);
-    formData.append('hinhAnh', selectedFile as Blob);
-    formData.append('maNhom', maNhom);
-    try {
-      const result = await dispatch(postMovieData(formData)).unwrap();
-      console.log(result);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+      formData.append('ngayKhoiChieu', ngayKhoiChieu);
+      formData.append('hinhAnh', selectedFile as Blob);
+      formData.append('maNhom', maNhom);
+      console.log(values);
+      try {
+        const result = await dispatch(postMovieData(formData)).unwrap();
+        dispatchAlert({
+          type: 'SUCCESS',
+          payload: 'Thêm phim thành công',
+        });
+        return result;
+      } catch (error) {
+        dispatchAlert({ type: 'ERROR', payload: error as string });
+        console.log(error);
+      }
+    },
+    [selectedFile, dispatch]
+  );
 
   useEffect(() => {
     if (!selectedFile) {
@@ -251,7 +314,9 @@ const MovieForm = () => {
                   >
                     Xóa tất cả
                   </Button>
-                  <Button type='submit'>Thêm</Button>
+                  <Button loading={alertState.isLoading} type='submit'>
+                    Thêm
+                  </Button>
                 </Group>
               </Grid.Col>
             </Grid>
@@ -272,18 +337,7 @@ const MovieForm = () => {
         </Grid>
       </form>
       <Space h={48} />
-      <Alert icon={<Loader size={24} />} color='indigo'>
-        Đang tải...
-      </Alert>
-      <Alert
-        icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
-        color='red'
-      >
-        things...
-      </Alert>
-      <Alert icon={<FontAwesomeIcon icon={faCheckCircle} />} color='green'>
-        things...
-      </Alert>
+      <FormAlert alertState={alertState} />
     </Container>
   );
 };
