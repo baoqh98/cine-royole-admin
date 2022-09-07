@@ -148,7 +148,7 @@ export default function UsersTable({ onGetAccount }: UserTableProps) {
       </td>
       <td>
         <Group spacing={0} position='center'>
-          <ActionIcon onClick={() => getAccountHandler(item.taiKhoan)}>
+          <ActionIcon onClick={() => onGetAccount(item.taiKhoan)}>
             <FontAwesomeIcon icon={faPen} />
           </ActionIcon>
           <ActionIcon

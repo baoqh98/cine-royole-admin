@@ -10,8 +10,20 @@ export const movieAPIs = {
     });
   },
 
+  getMovieDetail: (movieId: string) => {
+    const params = new URLSearchParams();
+    params.append('MaPhim', movieId);
+    return axiosClient.get<unknown, Movie>('QuanLyPhim/LayThongTinPhim', {
+      params,
+    });
+  },
+
   postMovie: (formData: FormData) => {
     return axiosClient.post('QuanLyPhim/ThemPhimUploadHinh', formData);
+  },
+
+  updateMovie: (formData: FormData) => {
+    return axiosClient.post('QuanLyPhim/CapNhatPhimUpload', formData);
   },
 
   deleteMovie: (id: string) => {

@@ -21,6 +21,25 @@ export const thunk = {
     return modifiedGetThunkFn;
   },
 
+  getDetailData: <T>(
+    name: string,
+    callbackGetDetail: (params: string) => Promise<T>
+  ) => {
+    const modifiedGetDetailThunkFn = createAsyncThunk(
+      name,
+      async (data: string, { rejectWithValue }) => {
+        try {
+          const result = await callbackGetDetail(data);
+          return result;
+        } catch (error) {
+          return rejectWithValue(error);
+        }
+      }
+    );
+
+    return modifiedGetDetailThunkFn;
+  },
+
   postData: <T>(name: string, callbackPost: (data: any) => Promise<T>) => {
     const modifiedPostThunkFn = createAsyncThunk(
       name,
@@ -37,8 +56,24 @@ export const thunk = {
     return modifiedPostThunkFn;
   },
 
+  updateData: <T>(name: string, callbackUpdate: (data: any) => Promise<T>) => {
+    const modifiedUpdateThunkFn = createAsyncThunk(
+      name,
+      async (data: any, { rejectWithValue }) => {
+        try {
+          const result = await callbackUpdate(data);
+          return result;
+        } catch (error) {
+          return rejectWithValue(error);
+        }
+      }
+    );
+
+    return modifiedUpdateThunkFn;
+  },
+
   deleteData: <T>(param: string, callbackDel: (data: any) => Promise<T>) => {
-    const modifiedPostThunkFn = createAsyncThunk(
+    const modifiedDeleteThunkFn = createAsyncThunk(
       param,
       async (data: any, { rejectWithValue }) => {
         try {
@@ -50,6 +85,6 @@ export const thunk = {
       }
     );
 
-    return modifiedPostThunkFn;
+    return modifiedDeleteThunkFn;
   },
 };

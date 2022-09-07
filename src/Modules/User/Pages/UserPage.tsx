@@ -34,7 +34,7 @@ const UserPage = () => {
     setIsShowForm((prev) => !prev);
   };
 
-  const getAccountDetailHandler = (account: string) => {
+  const getUserDetailHandler = (account: string) => {
     setIsShowFormHandler();
     dispatch(getUserDetail(account))
       .unwrap()
@@ -75,7 +75,7 @@ const UserPage = () => {
         )}
       </Group>
 
-      {!isShowForm && <UsersTable onGetAccount={getAccountDetailHandler} />}
+      {!isShowForm && <UsersTable onGetAccount={getUserDetailHandler} />}
       {isShowForm && <UserForm userDetail={userDetail} />}
     </Container>
   );

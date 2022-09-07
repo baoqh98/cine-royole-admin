@@ -12,8 +12,6 @@ import {
   Grid,
   TextInput,
   Button,
-  Alert,
-  Loader,
   Group,
   Space,
   Textarea,
@@ -25,14 +23,14 @@ import {
   Image,
 } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { MovieFormType } from '../../../../app/interface/movie/movie';
+import { Movie, MovieFormType } from '../../../../app/interface/movie/movie';
 import { useHover } from '@mantine/hooks';
 import CustomizedFileInput from './CustomizedFileInput';
 import { DatePicker } from '@mantine/dates';
 import { maNhom } from '../../../../app/apis/params';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../app/store';
-import { postMovieData } from '../../slice/movieSlice';
+import { postMovieData, updateMovieData } from '../../slice/movieSlice';
 import FormAlert from '../FormAlert';
 
 const useStyle = createStyles((theme) => ({
@@ -96,7 +94,11 @@ const alertReducer = (state: AlertState, { type, payload }: AlertAction) => {
   }
 };
 
-const MovieForm = () => {
+interface MovieFormProps {
+  movieDetail: Movie | undefined;
+}
+
+const MovieForm = ({ movieDetail }: MovieFormProps) => {
   const { classes } = useStyle();
 
   const [alertState, dispatchAlert] = useReducer(
@@ -108,6 +110,7 @@ const MovieForm = () => {
   const [sapChieuChip, setSapChieuChip] = useState<boolean>(false);
   const [danhGiaValue, setDanhGiaValue] = useState<number>(0);
   const [selectedFile, setSelectedFile] = useState<Blob>();
+  const [pickDateValue, setPickDateValue] = useState<string>();
   const [preview, setPreview] = useState<string>();
 
   const { hovered, ref } = useHover();
@@ -126,52 +129,142 @@ const MovieForm = () => {
       danhGia: 0,
       ngayKhoiChieu: '',
     },
-    validate: {
-      tenPhim: (value) => (value === '' ? 'Phải nhập tên phim' : null),
-      trailer: (value) => (value === '' ? 'Phải nhập trailer' : null),
-      moTa: (value) => (value === '' ? 'Chưa có mô tả phim' : null),
-      ngayKhoiChieu: (value) =>
-        value === '' ? 'Bạn phải chọn lịch chiếu' : null,
-    },
+    // validate: {
+    //   tenPhim: (value) => (value === '' ? 'Phải nhập tên phim' : null),
+    //   moTa: (value) => (value === '' ? 'Chưa có mô tả phim' : null),
+    //   ngayKhoiChieu: (value) =>
+    //     value === '' ? 'Bạn phải chọn lịch chiếu' : null,
+    // },
   });
 
   const resetFormHandler = () => {
     form.reset();
+    setPreview(undefined);
   };
 
   const submitHandler = useCallback(
     async (values: MovieFormType) => {
-      dispatchAlert({ type: 'PENDING' });
+      // dispatchAlert({ type: 'PENDING' });
       const date = new Date(values.ngayKhoiChieu);
       const dd = String(date.getDate()).padStart(2, '0');
       const mm = String(date.getMonth() + 1).padStart(2, '0');
       const yyyy = date.getFullYear();
       const ngayKhoiChieu = `${dd}/${mm}/${yyyy}`;
 
-      let formData = new FormData();
-      for (let key in values) {
-        if (values[key as keyof typeof values] === values.ngayKhoiChieu)
-          continue;
-        formData.append(key, `${values[key as keyof typeof values]}`);
-      }
+      // for (let key in values) {
+      //   if (values[key as keyof typeof values] === values.trailer) continue;
+      //   if (values[key as keyof typeof values] === values.ngayKhoiChieu)
+      //     continue;
+      //   if (values[key as keyof typeof values] === values.danhGia) {
+      //     formData.append(key, `${values.danhGia.toFixed(1)}`);
+      //     continue;
+      //   }
+      //   if (key === undefined) continue;
+      //   formData.append(key, `${values[key as keyof typeof values]}`);
+      // }
 
-      formData.append('ngayKhoiChieu', ngayKhoiChieu);
-      formData.append('hinhAnh', selectedFile as Blob);
-      formData.append('maNhom', maNhom);
+      console.log(values);
+      const { tenPhim, danhGia, moTa, hot, dangChieu, sapChieu, trailer } =
+        values;
+
+      // formData.append('tenPhim', tenPhim);
+      // formData.append('moTa', moTa);
+      // formData.append('ngayKhoiChieu', ngayKhoiChieu);
+      // formData.append('sapChieu', `${sapChieu}`);
+      // formData.append('dangChieu', `${dangChieu}`);
+      // formData.append('hot', `${hot}`);
+      // formData.append('danhGia', `${danhGia.toFixed(1)}`);
+      // formData.append('maNhom', maNhom);
+      // formData.append('hinhAnh', selectedFile as File);
+      // formData.append('ngayKhoiChieu', ngayKhoiChieu);
+
       try {
-        const result = await dispatch(postMovieData(formData)).unwrap();
-        dispatchAlert({
-          type: 'SUCCESS',
-          payload: 'Thêm phim thành công',
-        });
-        resetFormHandler();
-        return result;
+        if (movieDetail) {
+          console.log('update');
+          // let formData = new FormData();
+          // formData.append('maPhim', `${movieDetail.maPhim}`);
+          // formData.append('tenPhim', tenPhim);
+          // formData.append('moTa', moTa);
+          // formData.append('maPhim', maNhom);
+          // formData.append('ngayKhoiChieu', ngayKhoiChieu);
+          // formData.append('sapChieu', `${sapChieu}`);
+          // formData.append('dangChieu', `${dangChieu}`);
+          // formData.append('hot', `${hot}`);
+          // formData.append('danhGia', `${danhGia.toFixed(1)}`);
+          // formData.append('hinhAnh', selectedFile as Blob);
+
+          // formData.forEach((item) => console.log(item));
+          // const result = await dispatch(updateMovieData(formData)).unwrap();
+          // dispatchAlert({
+          //   type: 'SUCCESS',
+          //   payload: 'Cập nhật phim thành công',
+          // });
+          // resetFormHandler();
+          // return result;
+        } else {
+          console.log('post');
+          let formData = new FormData();
+          // formData.append('maPhim', `${movieDetail.maPhim}`);
+          formData.append('tenPhim', tenPhim);
+          formData.append('trailer', trailer);
+          formData.append('moTa', moTa);
+          formData.append('maPhim', maNhom);
+          formData.append('ngayKhoiChieu', ngayKhoiChieu);
+          formData.append('sapChieu', `${sapChieu}`);
+          formData.append('dangChieu', `${dangChieu}`);
+          formData.append('hot', `${hot}`);
+          formData.append('danhGia', `${danhGia.toFixed(1)}`);
+          formData.append('hinhAnh', selectedFile as Blob);
+          console.log(formData.forEach((_, i) => console.log(i)));
+          const result = await dispatch(postMovieData(formData)).unwrap();
+          dispatchAlert({
+            type: 'SUCCESS',
+            payload: 'Thêm phim thành công',
+          });
+          // resetFormHandler();
+          return result;
+        }
       } catch (error) {
+        console.log(error);
         dispatchAlert({ type: 'ERROR', payload: error as string });
       }
     },
-    [selectedFile, dispatch]
+    [selectedFile, movieDetail]
   );
+
+  useEffect(() => {
+    if (!movieDetail) return;
+    const {
+      tenPhim,
+      trailer,
+      danhGia,
+      moTa,
+      hot,
+      dangChieu,
+      sapChieu,
+      ngayKhoiChieu,
+      hinhAnh,
+    } = movieDetail;
+    const date = new Date(ngayKhoiChieu).toLocaleString('en-US', {
+      month: 'long',
+      day: '2-digit',
+      year: 'numeric',
+    });
+    setPickDateValue(date);
+    setPreview(hinhAnh);
+    setDanhGiaValue(danhGia);
+
+    form.setValues({
+      tenPhim,
+      trailer,
+      danhGia,
+      moTa,
+      dangChieu,
+      sapChieu,
+      hot,
+      ngayKhoiChieu: date.toString(),
+    });
+  }, [movieDetail]);
 
   useEffect(() => {
     if (!selectedFile) {
@@ -207,13 +300,13 @@ const MovieForm = () => {
                 <TextInput
                   placeholder='Youtube URL trailer'
                   label='Trailer URL'
-                  withAsterisk
+                  disabled={!!movieDetail}
                   {...form.getInputProps('trailer')}
                 />
               </Grid.Col>
               <Grid.Col sm={6}>
                 <DatePicker
-                  placeholder='Pick date'
+                  placeholder={pickDateValue || 'Pick date'}
                   label='Ngày chiếu'
                   withAsterisk
                   ref={dateRef}
@@ -242,8 +335,12 @@ const MovieForm = () => {
                   ]}
                   ref={ref}
                   showLabelOnHover={false}
-                  label={(value) => value.toFixed(1)}
-                  onChangeEnd={(value) => setDanhGiaValue(value)}
+                  label={(value) => {
+                    value.toFixed(1);
+                  }}
+                  onChangeEnd={(value) => {
+                    setDanhGiaValue(value);
+                  }}
                   styles={{
                     thumb: {
                       transition: 'opacity 150ms ease',
@@ -255,6 +352,15 @@ const MovieForm = () => {
                     },
                   }}
                   {...form.getInputProps('danhGia')}
+                />
+              </Grid.Col>
+              <Grid.Col sm={6}>
+                <Textarea
+                  placeholder='Viết mô tả'
+                  label='Viết mô tả'
+                  withAsterisk
+                  minRows={4}
+                  {...form.getInputProps('moTa')}
                 />
               </Grid.Col>
               <Grid.Col sm={6}>
@@ -293,15 +399,6 @@ const MovieForm = () => {
                   </Chip>
                 </Group>
               </Grid.Col>
-              <Grid.Col sm={6}>
-                <Textarea
-                  placeholder='Viết mô tả'
-                  label='Viết mô tả'
-                  withAsterisk
-                  minRows={3}
-                  {...form.getInputProps('moTa')}
-                />
-              </Grid.Col>
             </Grid>
             <Grid mt={24}>
               <Grid.Col sm={12}>
@@ -314,7 +411,7 @@ const MovieForm = () => {
                     Xóa tất cả
                   </Button>
                   <Button loading={alertState.isLoading} type='submit'>
-                    Thêm
+                    {movieDetail ? 'Cập nhật' : 'Thêm'}
                   </Button>
                 </Group>
               </Grid.Col>
@@ -327,9 +424,7 @@ const MovieForm = () => {
             <Space h={24} />
             <Group>
               <Box>
-                {preview && selectedFile && (
-                  <Image width='100%' radius='md' src={preview} />
-                )}
+                {preview && <Image width='100%' radius='md' src={preview} />}
               </Box>
             </Group>
           </Grid.Col>

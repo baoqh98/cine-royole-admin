@@ -64,7 +64,12 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export default function MovieTable() {
+interface MovieTableProps {
+  onGetMovieId: (movieId: string) => void;
+}
+
+export default function MovieTable({ onGetMovieId }: MovieTableProps) {
+  const [movieDetail, setMovieDetail] = useState<Movie>();
   const { classes, cx } = useStyles();
   const [isModalOpened, setIsModalOpen] = useState<boolean>(false);
   const [movieInfo, setMovieInfo] = useState<{
@@ -76,6 +81,8 @@ export default function MovieTable() {
   const { movies } = useSelector(movieSelector);
 
   const dispatch = useDispatch<AppDispatch>();
+
+  const getMovieIdHandler = (movieId: string) => {};
 
   const openDeleteModalHandler = (movieId: string, movieName: string) => {
     setIsModalOpen(true);
@@ -134,7 +141,10 @@ export default function MovieTable() {
       </td>
       <td className={classes.align}>
         <Group position='left' spacing={4}>
-          <ActionIcon color='green'>
+          <ActionIcon
+            color='green'
+            onClick={() => onGetMovieId(`${row.maPhim}`)}
+          >
             <FontAwesomeIcon icon={faPen} />
           </ActionIcon>
           <ActionIcon

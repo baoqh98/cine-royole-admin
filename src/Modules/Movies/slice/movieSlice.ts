@@ -15,10 +15,19 @@ const initialState: MovieState = {
   error: '',
 };
 
-const { getMovies, postMovie, deleteMovie } = movieAPIs;
+const { getMovies, postMovie, deleteMovie, getMovieDetail, updateMovie } =
+  movieAPIs;
 
 export const getMoviesData = thunk.getData('movie/getMovies', getMovies);
+export const getMovieDetailData = thunk.getDetailData(
+  'movie/getMovieDetail',
+  getMovieDetail
+);
 export const postMovieData = thunk.postData('movie/postMovie', postMovie);
+export const updateMovieData = thunk.updateData(
+  'movie/updateMovie',
+  updateMovie
+);
 export const deleteMovieData = thunk.deleteData(
   'movie/deleteMovie',
   deleteMovie
