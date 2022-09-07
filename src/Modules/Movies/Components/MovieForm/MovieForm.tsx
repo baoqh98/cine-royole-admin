@@ -203,6 +203,7 @@ const MovieForm = ({ movieDetail }: MovieFormProps) => {
           // return result;
         } else {
           console.log('post');
+          console.log(selectedFile);
           let formData = new FormData();
           // formData.append('maPhim', `${movieDetail.maPhim}`);
           formData.append('tenPhim', tenPhim);
