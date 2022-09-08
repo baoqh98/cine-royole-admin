@@ -12,6 +12,7 @@ import {
   Modal,
   Text,
   Button,
+  Loader,
 } from '@mantine/core';
 import { Movie } from '../../../../app/interface/movie/movie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -65,10 +66,14 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface MovieTableProps {
+  searchQuery: string;
   onGetMovieId: (movieId: string) => void;
 }
 
-export default function MovieTable({ onGetMovieId }: MovieTableProps) {
+export default function MovieTable({
+  onGetMovieId,
+  searchQuery,
+}: MovieTableProps) {
   const { classes, cx } = useStyles();
   const [isModalOpened, setIsModalOpen] = useState<boolean>(false);
   const [movieInfo, setMovieInfo] = useState<{
@@ -77,7 +82,7 @@ export default function MovieTable({ onGetMovieId }: MovieTableProps) {
   }>();
   const [status, setStatus] = useState<unknown>();
   const [scrolled, setScrolled] = useState(false);
-  const { movies } = useSelector(movieSelector);
+  const { movies, isLoading } = useSelector(movieSelector);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -100,8 +105,12 @@ export default function MovieTable({ onGetMovieId }: MovieTableProps) {
   };
 
   useEffect(() => {
-    dispatch(getMoviesData(null));
-  }, []);
+    if (searchQuery === '') {
+      dispatch(getMoviesData(null));
+    } else {
+      dispatch(getMoviesData(searchQuery));
+    }
+  }, [searchQuery]);
 
   const rows = movies.map((row) => (
     <tr key={row.maPhim}>
@@ -212,23 +221,26 @@ export default function MovieTable({ onGetMovieId }: MovieTableProps) {
         sx={{ height: 720 }}
         onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
       >
-        <Table sx={{ minWidth: 700 }}>
-          <thead
-            className={cx(classes.header, { [classes.scrolled]: scrolled })}
-          >
-            <tr>
-              <th>Tên phim</th>
-              <th>Hình ảnh</th>
-              <th>Bí danh</th>
-              <th>Trạng thái</th>
-              <th>Đánh giá</th>
-              <th>Mô tả</th>
-              <th>Ngày chiếu</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </Table>
+        {!isLoading && (
+          <Table sx={{ minWidth: 700 }}>
+            <thead
+              className={cx(classes.header, { [classes.scrolled]: scrolled })}
+            >
+              <tr>
+                <th>Tên phim</th>
+                <th>Hình ảnh</th>
+                <th>Bí danh</th>
+                <th>Trạng thái</th>
+                <th>Đánh giá</th>
+                <th>Mô tả</th>
+                <th>Ngày chiếu</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>{rows}</tbody>
+          </Table>
+        )}
+        {isLoading && <Loader size={48} />}
       </ScrollArea>
     </>
   );

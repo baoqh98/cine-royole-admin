@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Container,
   createStyles,
@@ -7,15 +7,20 @@ import {
   Group,
   Button,
   ActionIcon,
+  Grid,
+  Input,
+  Menu,
+  Autocomplete,
+  Box,
 } from '@mantine/core';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { User } from '../../../app/interface/user/user';
-import { AppDispatch } from '../../../app/store';
+import { AppDispatch, userSelector } from '../../../app/store';
 import UserForm from '../Components/UserForm';
 import UsersTable from '../Components/UsersTable';
-import { getUserDetail } from '../slice/usersSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCircleArrowLeft, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { getUserDetailData } from '../slice/usersSlice';
 
 const useStyle = createStyles((theme) => ({
   title: {
@@ -27,8 +32,26 @@ const useStyle = createStyles((theme) => ({
 const UserPage = () => {
   const [userDetail, setUserDetail] = useState<User | undefined>();
   const [isShowForm, setIsShowForm] = useState<boolean>(false);
+  const [isReset, setIsReset] = useState<boolean>(false);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const dispatch = useDispatch<AppDispatch>();
   const { classes } = useStyle();
+
+  const searchHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const { key } = event;
+    if (key !== 'Enter') return;
+
+    setSearchQuery(searchRef.current!.value);
+    setIsReset(true);
+  };
+
+  const resetHandler = () => {
+    setSearchQuery('');
+    setIsReset(false);
+    searchRef.current!.value = '';
+  };
 
   const setIsShowFormHandler = () => {
     setIsShowForm((prev) => !prev);
@@ -36,7 +59,7 @@ const UserPage = () => {
 
   const getUserDetailHandler = (account: string) => {
     setIsShowFormHandler();
-    dispatch(getUserDetail(account))
+    dispatch(getUserDetailData(account))
       .unwrap()
       .then((data) => setUserDetail(data[0]));
   };
@@ -48,14 +71,43 @@ const UserPage = () => {
 
       <Group>
         {!isShowForm && (
-          <Button
-            onClick={() => {
-              setIsShowForm(true);
-              setUserDetail(undefined);
+          <Group
+            position='apart'
+            sx={{
+              width: '100%',
             }}
           >
-            Thên tài khoản
-          </Button>
+            <Button
+              onClick={() => {
+                setIsShowForm(true);
+                setUserDetail(undefined);
+              }}
+            >
+              Thên tài khoản
+            </Button>
+            <Group>
+              {isReset && (
+                <Button
+                  onClick={resetHandler}
+                  size='xs'
+                  color='gray'
+                  variant='subtle'
+                >
+                  Reset
+                </Button>
+              )}
+              <Input
+                placeholder='Tìm người dùng'
+                icon={<FontAwesomeIcon icon={faSearch} />}
+                type='text'
+                sx={{
+                  minWidth: '300px',
+                }}
+                ref={searchRef}
+                onKeyDown={searchHandler}
+              />
+            </Group>
+          </Group>
         )}
 
         {isShowForm && (
@@ -75,7 +127,12 @@ const UserPage = () => {
         )}
       </Group>
 
-      {!isShowForm && <UsersTable onGetAccount={getUserDetailHandler} />}
+      {!isShowForm && (
+        <UsersTable
+          searchQuery={searchQuery}
+          onGetAccount={getUserDetailHandler}
+        />
+      )}
       {isShowForm && <UserForm userDetail={userDetail} />}
     </Container>
   );

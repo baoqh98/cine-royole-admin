@@ -16,41 +16,33 @@ const initialState: UserState = {
   error: '',
 };
 
-const { getUsers, postUser, deleteUser } = userAPIs;
+const { getUsers, postUser, deleteUser, getUserDetail, updateUser } = userAPIs;
 
 export const getUsersData = thunk.getData('user/getUsers', getUsers);
 export const postUserData = thunk.postData('user/postUser', postUser);
 export const deleteUserData = thunk.deleteData('user/deleteUser', deleteUser);
-
-export const getUserDetail = createAsyncThunk(
+export const getUserDetailData = thunk.getDetailData(
   'user/getUserDetail',
-  async (account: string, { rejectWithValue }) => {
-    try {
-      const { getUserDetail } = userAPIs;
-      const data = await getUserDetail(account);
-      return data;
-    } catch (error) {
-      throw rejectWithValue(error);
-    }
-  }
+  getUserDetail
 );
+export const updateUserData = thunk.updateData('user/updateUser', updateUser);
 
-export const updateUser = createAsyncThunk(
-  'user/updateUser',
-  async (user: User, { rejectWithValue }) => {
-    try {
-      const { updateUser } = userAPIs;
-      const updatedUser: NewUser = {
-        ...user,
-        maNhom,
-      };
-      const data = await updateUser(updatedUser);
-      return data;
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
+// export const updateUser = createAsyncThunk(
+//   'user/updateUser',
+//   async (user: User, { rejectWithValue }) => {
+//     try {
+//       const { updateUser } = userAPIs;
+//       const updatedUser: NewUser = {
+//         ...user,
+//         maNhom,
+//       };
+//       const data = await updateUser(updatedUser);
+//       return data;
+//     } catch (error) {
+//       return rejectWithValue(error);
+//     }
+//   }
+// );
 
 // export const deleteUser = createAsyncThunk(
 //   'user/deleteUser',

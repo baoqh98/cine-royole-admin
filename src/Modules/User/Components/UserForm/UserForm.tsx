@@ -19,7 +19,7 @@ import { useForm } from '@mantine/form';
 import { User } from '../../../../app/interface/user/user';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../app/store';
-import { postUserData, updateUser } from '../../slice/usersSlice';
+import { postUserData, updateUserData } from '../../slice/usersSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCheckCircle,
@@ -127,7 +127,7 @@ const UserForm = ({ userDetail }: UserFormProps) => {
     dispatchAlert({ type: 'PENDING' });
     try {
       if (userDetail) {
-        const data = await dispatch(updateUser(values)).unwrap();
+        const data = await dispatch(updateUserData(values)).unwrap();
         dispatchAlert({
           type: 'SUCCESS',
           payload: 'Cập nhật người dùng thành công',

@@ -2,9 +2,12 @@ import { Movie, MovieFormType } from './../interface/movie/movie';
 import { axiosClient } from './axiosClient';
 import { maNhom } from './params';
 export const movieAPIs = {
-  getMovies: () => {
+  getMovies: (searchQuery?: string) => {
     const params = new URLSearchParams();
     params.append('maNhom', maNhom);
+    if (searchQuery) {
+      params.append('tenPhim', searchQuery);
+    }
     return axiosClient.get<unknown, Movie[]>('QuanLyPhim/LayDanhSachPhim', {
       params,
     });

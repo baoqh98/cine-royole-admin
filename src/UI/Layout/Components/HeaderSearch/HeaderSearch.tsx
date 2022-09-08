@@ -13,6 +13,7 @@ import { useDisclosure } from '@mantine/hooks';
 const useStyles = createStyles((theme) => ({
   header: {
     position: 'fixed',
+    zIndex: 1000,
     top: 0,
     left: '240px',
     paddingLeft: theme.spacing.md,
@@ -70,7 +71,7 @@ interface HeaderSearchProps {
 
 const HeaderData: HeaderSearchProps = {
   links: [
-    { link: 'https://cineroyole.vercel.app/', label: 'Go to App' },
+    { link: 'https://cineroyole.vercel.app/', label: 'Go to CineRoyole App' },
     {
       link: 'https://github.com/hoquocbaoproton/cineroyole',
       label: 'GitHub CineRoyole',
@@ -112,7 +113,7 @@ export default function HeaderSearch() {
           <Group ml={50} spacing={5} className={classes.links}>
             {items}
           </Group>
-          <Autocomplete
+          {/* <Autocomplete
             className={classes.search}
             placeholder='Search'
             icon={<FontAwesomeIcon icon={faMagnifyingGlass} />}
@@ -125,7 +126,7 @@ export default function HeaderSearch() {
               'Svelte',
               'Blitz.js',
             ]}
-          />
+          /> */}
         </Group>
       </div>
     </Header>

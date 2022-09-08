@@ -37,8 +37,15 @@ export const userAPIs = {
     return axiosClient.post('QuanLyNguoiDung/ThemNguoiDung', newUser);
   },
 
-  updateUser: (user: NewUser) => {
-    return axiosClient.post('QuanLyNguoiDung/CapNhatThongTinNguoiDung', user);
+  updateUser: (user: User) => {
+    const updatedUser: NewUser = {
+      ...user,
+      maNhom,
+    };
+    return axiosClient.post(
+      'QuanLyNguoiDung/CapNhatThongTinNguoiDung',
+      updatedUser
+    );
   },
 
   deleteUser: (account: string) => {

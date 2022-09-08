@@ -16,6 +16,7 @@ import {
   Modal,
   Title,
   Center,
+  Loader,
 } from '@mantine/core';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -56,10 +57,14 @@ const jobColors: Record<string, string> = {
 };
 
 interface UserTableProps {
+  searchQuery: string;
   onGetAccount: (account: string) => void;
 }
 
-export default function UsersTable({ onGetAccount }: UserTableProps) {
+export default function UsersTable({
+  onGetAccount,
+  searchQuery,
+}: UserTableProps) {
   const [status, setStatus] = useState<unknown>('');
   const [account, setAccount] = useState<string>('');
   const [isModalOpened, setIsModalOpen] = useState<boolean>(false);
@@ -69,10 +74,6 @@ export default function UsersTable({ onGetAccount }: UserTableProps) {
   const theme = useMantineTheme();
   const { classes, cx } = useStyles();
   const [scrolled, setScrolled] = useState<boolean>(false);
-
-  const getAccountHandler = (account: string) => {
-    onGetAccount(account);
-  };
 
   const openDeleteModalHandler = (account: string) => {
     setStatus('');
@@ -91,8 +92,12 @@ export default function UsersTable({ onGetAccount }: UserTableProps) {
   };
 
   useEffect(() => {
-    dispatch(getUsersData(null));
-  }, []);
+    if (searchQuery === '') {
+      dispatch(getUsersData(null));
+    } else {
+      dispatch(getUsersData(searchQuery));
+    }
+  }, [searchQuery]);
 
   const rows = users.map((item) => (
     <tr key={Math.random()}>
@@ -148,7 +153,7 @@ export default function UsersTable({ onGetAccount }: UserTableProps) {
       </td>
       <td>
         <Group spacing={0} position='center'>
-          <ActionIcon onClick={() => onGetAccount(item.taiKhoan)}>
+          <ActionIcon color='green' onClick={() => onGetAccount(item.taiKhoan)}>
             <FontAwesomeIcon icon={faPen} />
           </ActionIcon>
           <ActionIcon
@@ -209,22 +214,25 @@ export default function UsersTable({ onGetAccount }: UserTableProps) {
         sx={{ height: 720 }}
         onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
       >
-        <Table sx={{ minWidth: 800 }} verticalSpacing='sm'>
-          <thead
-            className={cx(classes.header, { [classes.scrolled]: scrolled })}
-          >
-            <tr>
-              <th>Tài khoản</th>
-              <th>Họ và Tên</th>
-              <th>Vai trò</th>
-              <th>Email</th>
-              <th>Mật khẩu</th>
-              <th>Số điện thoại</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>{!isLoading && rows}</tbody>
-        </Table>
+        {!isLoading && (
+          <Table sx={{ minWidth: 800 }} verticalSpacing='sm'>
+            <thead
+              className={cx(classes.header, { [classes.scrolled]: scrolled })}
+            >
+              <tr>
+                <th>Tài khoản</th>
+                <th>Họ và Tên</th>
+                <th>Vai trò</th>
+                <th>Email</th>
+                <th>Mật khẩu</th>
+                <th>Số điện thoại</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>{rows}</tbody>
+          </Table>
+        )}
+        {isLoading && <Loader size={48} />}
       </ScrollArea>
     </>
   );
