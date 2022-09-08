@@ -5,7 +5,6 @@ import React, {
   useRef,
   useCallback,
 } from 'react';
-import { useForm } from '@mantine/form';
 
 import {
   Container,
@@ -21,6 +20,8 @@ import {
   createStyles,
   Badge,
   Image,
+  FileInput,
+  NumberInput,
 } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Movie, MovieFormType } from '../../../../app/interface/movie/movie';
@@ -32,6 +33,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../app/store';
 import { postMovieData, updateMovieData } from '../../slice/movieSlice';
 import FormAlert from '../FormAlert';
+import { useForm } from '@mantine/form';
 
 const useStyle = createStyles((theme) => ({
   customLabel: {
@@ -108,15 +110,11 @@ const MovieForm = ({ movieDetail }: MovieFormProps) => {
   const [hotChip, setHotChip] = useState<boolean>(false);
   const [dangChieuChip, setDangChieuChip] = useState<boolean>(false);
   const [sapChieuChip, setSapChieuChip] = useState<boolean>(false);
-  const [danhGiaValue, setDanhGiaValue] = useState<number>(0);
   const [selectedFile, setSelectedFile] = useState<Blob>();
   const [pickDateValue, setPickDateValue] = useState<string>();
   const [preview, setPreview] = useState<string>();
 
-  const { hovered, ref } = useHover();
   const dateRef = useRef<HTMLInputElement>(null);
-
-  const dispatch = useDispatch<AppDispatch>();
 
   const form = useForm({
     initialValues: {
@@ -129,100 +127,53 @@ const MovieForm = ({ movieDetail }: MovieFormProps) => {
       danhGia: 0,
       ngayKhoiChieu: '',
     },
-    // validate: {
-    //   tenPhim: (value) => (value === '' ? 'Phải nhập tên phim' : null),
-    //   moTa: (value) => (value === '' ? 'Chưa có mô tả phim' : null),
-    //   ngayKhoiChieu: (value) =>
-    //     value === '' ? 'Bạn phải chọn lịch chiếu' : null,
-    // },
+    validate: {
+      tenPhim: (value) => (value === '' ? 'Bạn chưa nhập tên phim' : null),
+      ngayKhoiChieu: (value) => (value === '' ? 'Chọn ngày khởi chiếu' : null),
+    },
   });
+
+  const dispatch = useDispatch<AppDispatch>();
 
   const resetFormHandler = () => {
     form.reset();
+    setSelectedFile(undefined);
     setPreview(undefined);
   };
 
   const submitHandler = useCallback(
     async (values: MovieFormType) => {
-      // dispatchAlert({ type: 'PENDING' });
-      const date = new Date(values.ngayKhoiChieu);
-      const dd = String(date.getDate()).padStart(2, '0');
-      const mm = String(date.getMonth() + 1).padStart(2, '0');
-      const yyyy = date.getFullYear();
-      const ngayKhoiChieu = `${dd}/${mm}/${yyyy}`;
-
-      // for (let key in values) {
-      //   if (values[key as keyof typeof values] === values.trailer) continue;
-      //   if (values[key as keyof typeof values] === values.ngayKhoiChieu)
-      //     continue;
-      //   if (values[key as keyof typeof values] === values.danhGia) {
-      //     formData.append(key, `${values.danhGia.toFixed(1)}`);
-      //     continue;
-      //   }
-      //   if (key === undefined) continue;
-      //   formData.append(key, `${values[key as keyof typeof values]}`);
-      // }
-
-      console.log(values);
-      const { tenPhim, danhGia, moTa, hot, dangChieu, sapChieu, trailer } =
-        values;
-
-      // formData.append('tenPhim', tenPhim);
-      // formData.append('moTa', moTa);
-      // formData.append('ngayKhoiChieu', ngayKhoiChieu);
-      // formData.append('sapChieu', `${sapChieu}`);
-      // formData.append('dangChieu', `${dangChieu}`);
-      // formData.append('hot', `${hot}`);
-      // formData.append('danhGia', `${danhGia.toFixed(1)}`);
-      // formData.append('maNhom', maNhom);
-      // formData.append('hinhAnh', selectedFile as File);
-      // formData.append('ngayKhoiChieu', ngayKhoiChieu);
-
+      dispatchAlert({ type: 'PENDING' });
       try {
-        if (movieDetail) {
-          console.log('update');
-          // let formData = new FormData();
-          // formData.append('maPhim', `${movieDetail.maPhim}`);
-          // formData.append('tenPhim', tenPhim);
-          // formData.append('moTa', moTa);
-          // formData.append('maPhim', maNhom);
-          // formData.append('ngayKhoiChieu', ngayKhoiChieu);
-          // formData.append('sapChieu', `${sapChieu}`);
-          // formData.append('dangChieu', `${dangChieu}`);
-          // formData.append('hot', `${hot}`);
-          // formData.append('danhGia', `${danhGia.toFixed(1)}`);
-          // formData.append('hinhAnh', selectedFile as Blob);
+        const date = new Date(dateRef.current!.value);
+        const dd = String(date.getDate()).padStart(2, '0');
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const yyyy = date.getFullYear();
+        const ngayKhoiChieu = `${dd}/${mm}/${yyyy}`;
 
-          // formData.forEach((item) => console.log(item));
-          // const result = await dispatch(updateMovieData(formData)).unwrap();
-          // dispatchAlert({
-          //   type: 'SUCCESS',
-          //   payload: 'Cập nhật phim thành công',
-          // });
-          // resetFormHandler();
-          // return result;
+        if (movieDetail) {
+          const result = await dispatch(
+            updateMovieData({
+              values,
+              ngayKhoiChieu,
+              selectedFile,
+              maPhim: movieDetail.maPhim,
+            })
+          ).unwrap();
+          dispatchAlert({
+            type: 'SUCCESS',
+            payload: 'Cập nhật phim thành công',
+          });
+          return result;
         } else {
-          console.log('post');
-          console.log(selectedFile);
-          let formData = new FormData();
-          // formData.append('maPhim', `${movieDetail.maPhim}`);
-          formData.append('tenPhim', tenPhim);
-          formData.append('trailer', trailer);
-          formData.append('moTa', moTa);
-          formData.append('maPhim', maNhom);
-          formData.append('ngayKhoiChieu', ngayKhoiChieu);
-          formData.append('sapChieu', `${sapChieu}`);
-          formData.append('dangChieu', `${dangChieu}`);
-          formData.append('hot', `${hot}`);
-          formData.append('danhGia', `${danhGia.toFixed(1)}`);
-          formData.append('hinhAnh', selectedFile as Blob);
-          console.log(formData.forEach((_, i) => console.log(i)));
-          const result = await dispatch(postMovieData(formData)).unwrap();
+          const result = await dispatch(
+            postMovieData({ values, ngayKhoiChieu, selectedFile })
+          ).unwrap();
           dispatchAlert({
             type: 'SUCCESS',
             payload: 'Thêm phim thành công',
           });
-          // resetFormHandler();
+          resetFormHandler();
           return result;
         }
       } catch (error) {
@@ -230,8 +181,18 @@ const MovieForm = ({ movieDetail }: MovieFormProps) => {
         dispatchAlert({ type: 'ERROR', payload: error as string });
       }
     },
-    [selectedFile, movieDetail]
+    [selectedFile, dispatch]
   );
+
+  const onChangeImage = (file: Blob) => {
+    setSelectedFile(file);
+
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(file);
+    fileReader.onload = (event: any) => {
+      setPreview(event.target.result);
+    };
+  };
 
   useEffect(() => {
     if (!movieDetail) return;
@@ -253,31 +214,17 @@ const MovieForm = ({ movieDetail }: MovieFormProps) => {
     });
     setPickDateValue(date);
     setPreview(hinhAnh);
-    setDanhGiaValue(danhGia);
-
     form.setValues({
       tenPhim,
       trailer,
       danhGia,
       moTa,
+      hot,
       dangChieu,
       sapChieu,
-      hot,
-      ngayKhoiChieu: date.toString(),
+      ngayKhoiChieu: date,
     });
   }, [movieDetail]);
-
-  useEffect(() => {
-    if (!selectedFile) {
-      setPreview(undefined);
-      return;
-    }
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl as string);
-
-    // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
 
   return (
     <Container
@@ -299,9 +246,8 @@ const MovieForm = ({ movieDetail }: MovieFormProps) => {
               </Grid.Col>
               <Grid.Col sm={6}>
                 <TextInput
+                  label='Trailer'
                   placeholder='Youtube URL trailer'
-                  label='Trailer URL'
-                  disabled={!!movieDetail}
                   {...form.getInputProps('trailer')}
                 />
               </Grid.Col>
@@ -309,49 +255,17 @@ const MovieForm = ({ movieDetail }: MovieFormProps) => {
                 <DatePicker
                   placeholder={pickDateValue || 'Pick date'}
                   label='Ngày chiếu'
-                  withAsterisk
                   ref={dateRef}
                   {...form.getInputProps('ngayKhoiChieu')}
                 />
               </Grid.Col>
               <Grid.Col sm={6}>
-                <label className={classes.customLabel}>
-                  Đánh giá
-                  <span> </span>
-                  <span className={classes.asterisk}>*</span>
-                  <Badge ml='md' color='yellow' variant='filled'>
-                    {danhGiaValue?.toFixed(1)}
-                  </Badge>
-                </label>
-                <Space h={4} />
-                <Slider
-                  defaultValue={40}
+                <NumberInput
                   min={0}
                   max={10}
                   step={0.1}
-                  color='yellow'
-                  marks={[
-                    { value: 10, label: '10' },
-                    { value: 0, label: '0' },
-                  ]}
-                  ref={ref}
-                  showLabelOnHover={false}
-                  label={(value) => {
-                    value.toFixed(1);
-                  }}
-                  onChangeEnd={(value) => {
-                    setDanhGiaValue(value);
-                  }}
-                  styles={{
-                    thumb: {
-                      transition: 'opacity 150ms ease',
-                      opacity: hovered ? 1 : 0,
-                    },
-
-                    dragging: {
-                      opacity: 1,
-                    },
-                  }}
+                  label='Đánh giá'
+                  placeholder='Nhập số điểm'
                   {...form.getInputProps('danhGia')}
                 />
               </Grid.Col>
@@ -420,7 +334,7 @@ const MovieForm = ({ movieDetail }: MovieFormProps) => {
           </Grid.Col>
           <Grid.Col sm={4}>
             <CustomizedFileInput
-              onChange={(payload) => setSelectedFile(payload as Blob)}
+              onChange={(payload) => onChangeImage(payload as File)}
             />
             <Space h={24} />
             <Group>

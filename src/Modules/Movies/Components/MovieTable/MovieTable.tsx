@@ -69,7 +69,6 @@ interface MovieTableProps {
 }
 
 export default function MovieTable({ onGetMovieId }: MovieTableProps) {
-  const [movieDetail, setMovieDetail] = useState<Movie>();
   const { classes, cx } = useStyles();
   const [isModalOpened, setIsModalOpen] = useState<boolean>(false);
   const [movieInfo, setMovieInfo] = useState<{
@@ -81,8 +80,6 @@ export default function MovieTable({ onGetMovieId }: MovieTableProps) {
   const { movies } = useSelector(movieSelector);
 
   const dispatch = useDispatch<AppDispatch>();
-
-  const getMovieIdHandler = (movieId: string) => {};
 
   const openDeleteModalHandler = (movieId: string, movieName: string) => {
     setIsModalOpen(true);
@@ -163,7 +160,10 @@ export default function MovieTable({ onGetMovieId }: MovieTableProps) {
       <Modal
         title='Bạn có chắc chắn xóa phim?'
         opened={isModalOpened}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setStatus(undefined);
+        }}
         centered
         overlayBlur={4}
       >
@@ -198,7 +198,9 @@ export default function MovieTable({ onGetMovieId }: MovieTableProps) {
 
           <Button
             color='red'
-            onClick={() => deleteAccountHandler(movieInfo!.movieId)}
+            onClick={() => {
+              deleteAccountHandler(movieInfo!.movieId);
+            }}
           >
             Xóa tài khoản
           </Button>

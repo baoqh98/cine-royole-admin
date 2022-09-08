@@ -18,5 +18,5 @@ export interface MovieFormType
     Movie,
     'maNhom' | 'biDanh' | 'maPhim' | 'ngayKhoiChieu' | 'hinhAnh'
   > {
-  ngayKhoiChieu: string;
+  // ngayKhoiChieu: string;
 }
