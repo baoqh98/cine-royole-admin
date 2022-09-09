@@ -177,7 +177,6 @@ const MovieForm = ({ movieDetail }: MovieFormProps) => {
           return result;
         }
       } catch (error) {
-        console.log(error);
         dispatchAlert({ type: 'ERROR', payload: error as string });
       }
     },

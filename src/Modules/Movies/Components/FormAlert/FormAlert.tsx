@@ -22,7 +22,6 @@ const FormAlert = ({ alertState }: Props) => {
       {alertState.isLoading && (
         <Alert
           icon={<Loader size={24} />}
-          // title={userDetail ? 'Cập nhật người dùng' : 'Thêm người dùng'}
           color='indigo'
         >
           Đang tải...
@@ -31,11 +30,6 @@ const FormAlert = ({ alertState }: Props) => {
       {alertState.error && (
         <Alert
           icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
-          // title={
-          //   userDetail
-          //     ? 'Cập nhật người dùng thất bại'
-          //     : 'Thêm người dùng thất bại'
-          // }
           color='red'
         >
           {alertState.error}
@@ -44,11 +38,6 @@ const FormAlert = ({ alertState }: Props) => {
       {alertState.success && (
         <Alert
           icon={<FontAwesomeIcon icon={faCheckCircle} />}
-          // title={
-          //   userDetail
-          //     ? 'Cập nhật người dùng thành công'
-          //     : 'Thêm người dùng thành công'
-          // }
           color='green'
         >
           {alertState.success}

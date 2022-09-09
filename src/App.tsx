@@ -5,10 +5,12 @@ import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import { AppDispatch } from './app/store';
 import { login } from './Modules/Auth/slice/authSlice';
+import Showtime404 from './Modules/Showtime/Components/Showtime404';
 import Layout from './UI/Layout/Pages/Layout';
 
 const UserPage = React.lazy(() => import('./Modules/User/Pages/UserPage'));
 const MoviesPage = React.lazy(() => import('./Modules/Movies/Pages'));
+const Showtime = React.lazy(() => import('./Modules/Showtime/Pages'));
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -32,7 +34,10 @@ function App() {
           <Route path='/' element={<Layout />}>
             <Route path='/' element={<UserPage />} />
             <Route path='/movies' element={<MoviesPage />} />
-            <Route path='/showtimes' />
+            <Route path='/showtime'>
+              <Route path='' element={<Showtime404 />} />
+              <Route path=':movieId' element={<Showtime />} />
+            </Route>
           </Route>
         </Routes>
       </Suspense>

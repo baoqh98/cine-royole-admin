@@ -20,6 +20,7 @@ import { faPen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, movieSelector } from '../../../../app/store';
 import { deleteMovieData, getMoviesData } from '../../slice/movieSlice';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -63,6 +64,15 @@ const useStyles = createStyles((theme) => ({
   scrolled: {
     boxShadow: theme.shadows.sm,
   },
+
+  movieName: {
+    textDecoration: 'underline',
+    cursor: 'pointer',
+    color: theme.colors.blue,
+    '&:active': {
+      transform: 'translateY(2px)',
+    },
+  },
 }));
 
 interface MovieTableProps {
@@ -84,6 +94,7 @@ export default function MovieTable({
   const [scrolled, setScrolled] = useState(false);
   const { movies, isLoading } = useSelector(movieSelector);
 
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
   const openDeleteModalHandler = (movieId: string, movieName: string) => {
@@ -114,7 +125,12 @@ export default function MovieTable({
 
   const rows = movies.map((row) => (
     <tr key={row.maPhim}>
-      <td className={classes.align}>{row.tenPhim}</td>
+      <td
+        onClick={() => navigate(`/showtime/${row.maPhim}`)}
+        className={`${classes.align} ${classes.movieName}`}
+      >
+        {row.tenPhim}
+      </td>
       <td className={classes.align}>
         <Image
           sx={{

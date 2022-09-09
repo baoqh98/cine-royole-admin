@@ -13,7 +13,6 @@ import { useDisclosure } from '@mantine/hooks';
 const useStyles = createStyles((theme) => ({
   header: {
     position: 'fixed',
-    zIndex: 1000,
     top: 0,
     left: '240px',
     paddingLeft: theme.spacing.md,

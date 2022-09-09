@@ -99,7 +99,7 @@ const useStyles = createStyles((theme, _params, getRef) => {
 const data = [
   { link: '/', label: 'Quản lý người dùng', icon: faUserGroup },
   { link: '/movies', label: 'Quản lý phim', icon: faTheaterMasks },
-  { link: '/showtimes', label: 'Quản lý lịch chiếu', icon: faCalendar },
+  { link: '/showtime', label: 'Quản lý lịch chiếu', icon: faCalendar },
 ];
 
 export default function SideBar() {
