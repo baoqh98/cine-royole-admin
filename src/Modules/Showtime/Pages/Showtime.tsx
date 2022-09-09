@@ -166,8 +166,6 @@ const Showtime = () => {
         type: 'SUCCESS',
         payload: result as unknown as string,
       });
-
-      form.reset();
       return result;
     } catch (error) {
       dispatchAlert({ type: 'ERROR', payload: error as string });
