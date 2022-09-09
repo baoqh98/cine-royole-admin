@@ -27,7 +27,7 @@ import {
 } from '../slice/showtimeSlice';
 import { Theater, Cluster } from '../../../app/interface/showtime/showtime';
 import { useForm } from '@mantine/form';
-import FormAlert from '../../Movies/Components/FormAlert';
+import FormAlert from '../../../UI/FormAlert';
 
 const useStyle = createStyles((theme) => ({
   title: {
@@ -166,6 +166,8 @@ const Showtime = () => {
         type: 'SUCCESS',
         payload: result as unknown as string,
       });
+
+      form.reset();
       return result;
     } catch (error) {
       dispatchAlert({ type: 'ERROR', payload: error as string });
@@ -210,23 +212,24 @@ const Showtime = () => {
               withAsterisk
             />
             <Space h={16} />
+
+            <Select
+              label='Chọn cụm rạp'
+              placeholder='Trống'
+              data={
+                clusterList?.map((item) => ({
+                  value: item.maCumRap,
+                  label: item.tenCumRap,
+                })) || []
+              }
+              onChange={setClusterCode}
+              withAsterisk
+            />
+            <Space h={16} />
             <form
               onSubmit={form.onSubmit(submitHandler)}
               className={classes.form}
             >
-              <Select
-                label='Chọn cụm rạp'
-                placeholder='Trống'
-                data={
-                  clusterList?.map((item) => ({
-                    value: item.maCumRap,
-                    label: item.tenCumRap,
-                  })) || []
-                }
-                onChange={setClusterCode}
-                withAsterisk
-              />
-              <Space h={16} />
               <DatePicker
                 label='Ngày chiếu'
                 placeholder='Chọn ngày chiếu'
@@ -257,6 +260,7 @@ const Showtime = () => {
             </form>
           </Grid.Col>
         </Grid>
+        <Space h={24} />
         <FormAlert alertState={alertState} />
       </Container>
     </>

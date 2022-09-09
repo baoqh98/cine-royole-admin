@@ -25,6 +25,7 @@ import {
   faCheckCircle,
   faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
+import FormAlert from '../../../../UI/FormAlert';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -230,7 +231,8 @@ const UserForm = ({ userDetail }: UserFormProps) => {
           </Group>
         </form>
         <Space h={48} />
-        {alertState.isLoading && (
+        <FormAlert alertState={alertState} />
+        {/* {alertState.isLoading && (
           <Alert
             icon={<Loader size={24} />}
             title={userDetail ? 'Cập nhật người dùng' : 'Thêm người dùng'}
@@ -264,7 +266,7 @@ const UserForm = ({ userDetail }: UserFormProps) => {
           >
             {alertState.success}
           </Alert>
-        )}
+        )} */}
       </Container>
     </>
   );

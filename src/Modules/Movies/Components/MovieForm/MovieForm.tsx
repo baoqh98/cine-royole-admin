@@ -32,7 +32,7 @@ import { maNhom } from '../../../../app/apis/params';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../../../app/store';
 import { postMovieData, updateMovieData } from '../../slice/movieSlice';
-import FormAlert from '../FormAlert';
+import FormAlert from '../../../../UI/FormAlert';
 import { useForm } from '@mantine/form';
 
 const useStyle = createStyles((theme) => ({
