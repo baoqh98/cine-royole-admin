@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
 
 import {
   Container,
@@ -12,6 +12,7 @@ import {
   NumberInput,
   Group,
   Button,
+  Alert,
 } from '@mantine/core';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -24,11 +25,9 @@ import {
   getTheatersData,
   postShowtimeData,
 } from '../slice/showtimeSlice';
-import {
-  Theater,
-  Cluster,
-} from '../../../app/interface/showtime/showtime';
+import { Theater, Cluster } from '../../../app/interface/showtime/showtime';
 import { useForm } from '@mantine/form';
+import FormAlert from '../../Movies/Components/FormAlert';
 
 const useStyle = createStyles((theme) => ({
   title: {
@@ -47,6 +46,52 @@ const useStyle = createStyles((theme) => ({
   },
 }));
 
+interface AlertState {
+  isLoading: boolean;
+  success: string;
+  error: string;
+}
+interface AlertAction {
+  type: string;
+  payload?: string;
+}
+
+const initialAlertState: AlertState = {
+  isLoading: false,
+  success: '',
+  error: '',
+};
+
+const alertReducer = (state: AlertState, { type, payload }: AlertAction) => {
+  switch (type) {
+    case 'PENDING':
+      return {
+        ...initialAlertState,
+        isLoading: true,
+      };
+    case 'SUCCESS':
+      return {
+        ...state,
+        isLoading: false,
+        error: '',
+        success: payload as string,
+      };
+    case 'ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        error: payload as string,
+        success: '',
+      };
+    case 'RESET':
+      return {
+        ...initialAlertState,
+      };
+    default:
+      return state;
+  }
+};
+
 const Showtime = () => {
   const { classes } = useStyle();
   const { movieId } = useParams();
@@ -56,6 +101,10 @@ const Showtime = () => {
   const [clusterCode, setClusterCode] = useState<string | null>(null);
   const [cluster, setCluster] = useState<string | null>(null);
 
+  const [alertState, dispatchAlert] = useReducer(
+    alertReducer,
+    initialAlertState
+  );
 
   const form = useForm({
     initialValues: {
@@ -94,6 +143,8 @@ const Showtime = () => {
   }, [cluster]);
 
   const submitHandler = async (values: any) => {
+    dispatchAlert({ type: 'PENDING' });
+
     try {
       const { giaVe, ngayChieu, gioChieu } = values;
       const date = new Date(ngayChieu);
@@ -111,9 +162,13 @@ const Showtime = () => {
       };
 
       const result = await dispatch(postShowtimeData(showtimeData)).unwrap();
+      dispatchAlert({
+        type: 'SUCCESS',
+        payload: result as unknown as string,
+      });
       return result;
     } catch (error) {
-      console.log(error);
+      dispatchAlert({ type: 'ERROR', payload: error as string });
     }
   };
 
@@ -202,6 +257,7 @@ const Showtime = () => {
             </form>
           </Grid.Col>
         </Grid>
+        <FormAlert alertState={alertState} />
       </Container>
     </>
   );
