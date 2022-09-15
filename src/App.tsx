@@ -17,7 +17,7 @@ function App() {
 
   // DUMMY ACCOUNT IN ORDER TO IMMEDIATELY ACCESS TO API
   useEffect(() => {
-    dispatch(login({ taiKhoan: 'abc123', matKhau: '123456789' }));
+    dispatch(login({ taiKhoan: 'nguyendai123', matKhau: 'npd123' }));
   }, []);
 
   return (
