@@ -75,7 +75,7 @@ const MoviesPage = () => {
                 setMovieDetail(undefined);
               }}
             >
-              Thên tài khoản
+              Thên phim
             </Button>
             <Group>
               {isReset && (
